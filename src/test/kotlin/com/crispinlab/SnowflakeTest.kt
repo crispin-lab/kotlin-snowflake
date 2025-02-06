@@ -74,4 +74,51 @@ class SnowflakeTest {
         Assertions.assertThat(futures.map { it!!.get() }.toSet()).hasSize(iterations)
         executorService.shutdown()
     }
+
+    @Test
+    fun generateSnowflakeFailTest() {
+        // given
+        val wrongNodeId = -1L
+        val nodeIdBits = 10
+        val maxNodeId: Long = (1L shl nodeIdBits) - 1
+
+        // when & then
+        Assertions
+            .assertThatThrownBy {
+                Snowflake(wrongNodeId)
+            }.hasMessage(
+                "NodeId must be between ${0} and $maxNodeId"
+            )
+    }
+
+    @Test
+    fun generateNodeIdTest() {
+        // given
+        val nodeIdIndex = 1
+
+        // when
+        val snowflake = Snowflake()
+
+        // then
+        val nodeId: Long = snowflake.parse(snowflake.nextId())[nodeIdIndex]
+        SoftAssertions.assertSoftly {
+            it.assertThat(nodeId).isNotNull
+            it.assertThat(nodeId).isGreaterThan(0)
+        }
+    }
+
+    @Test
+    fun snowflakeTimeOrderTest() {
+        // given
+        val nodeId = 777L
+        val snowflake = Snowflake(nodeId)
+
+        // when & then
+        var prevId: Long = snowflake.nextId()
+        for (i: Int in 0..<1000) {
+            val currentId: Long = snowflake.nextId()
+            Assertions.assertThat(currentId).isGreaterThan(prevId)
+            prevId = currentId
+        }
+    }
 }
