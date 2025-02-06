@@ -30,9 +30,9 @@ class Snowflake(
         private fun createNodeId(): Long {
             var nodeId: Int
             try {
-                val stringBuilder = StringBuilder()
                 val networkInterfaces: Enumeration<NetworkInterface> =
                     NetworkInterface.getNetworkInterfaces()
+                val stringBuilder = StringBuilder()
                 while (networkInterfaces.hasMoreElements()) {
                     val networkInterface: NetworkInterface = networkInterfaces.nextElement()
                     val mac: ByteArray? = networkInterface.hardwareAddress
