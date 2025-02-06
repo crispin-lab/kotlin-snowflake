@@ -21,6 +21,7 @@ class SnowflakeTest {
         // when
         val id: Long = snowflake.nextId()
 
+        // then
         val parses: Array<Long> = snowflake.parse(id)
         SoftAssertions.assertSoftly {
             it.assertThat(parses[0]).isGreaterThanOrEqualTo(beforeTimestamp)
