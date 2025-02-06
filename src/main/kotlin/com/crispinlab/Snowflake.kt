@@ -50,10 +50,8 @@ class Snowflake(
         }
     }
 
-    @Volatile
     private var lastTimestamp: Long = -1L
 
-    @Volatile
     private var sequence: Long = 0L
 
     constructor(nodeId: Long) : this(nodeId, customEpoch = DEFAULT_EPOCH)
