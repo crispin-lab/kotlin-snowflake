@@ -5,6 +5,7 @@ import java.security.SecureRandom
 import java.time.Instant
 import java.util.Enumeration
 
+
 class Snowflake(
     private val nodeId: Long,
     private val customEpoch: Long
@@ -87,11 +88,11 @@ class Snowflake(
     private fun timestamp(): Long = Instant.now().toEpochMilli() - customEpoch
 
     private fun waitNextMillis(currentTimestamp: Long): Long {
-        var nextMillis: Long = currentTimestamp
-        while (currentTimestamp == lastTimestamp) {
-            nextMillis = timestamp()
+        var timestamp: Long = currentTimestamp
+        while (timestamp == lastTimestamp) {
+            timestamp = timestamp()
         }
-        return nextMillis
+        return timestamp
     }
 
     fun parse(id: Long): Array<Long> {
