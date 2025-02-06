@@ -17,8 +17,7 @@ class SnowflakePerformanceTest {
 
         // when
         for (i: Int in 0..<iterations) {
-            val nextId = snowflake.nextId()
-            println(nextId)
+            snowflake.nextId()
         }
 
         // then
@@ -44,7 +43,7 @@ class SnowflakePerformanceTest {
         for (i: Int in 0..<iterations) {
             futures[i] =
                 executorService.submit<Long> {
-                    val nextId = snowflake.nextId()
+                    val nextId: Long = snowflake.nextId()
                     latch.countDown()
                     nextId
                 }
@@ -53,12 +52,10 @@ class SnowflakePerformanceTest {
         latch.await()
         futures.map { tmp.add(it!!.get()) }
 
-        println(tmp.size)
-
         // then
         val end: Long = System.currentTimeMillis()
         val time: Long = iterations / (end - start)
-        println("Single Thread -> IDs generate per ms: $time")
+        println("Multi Thread -> IDs generate per ms: $time")
         executorService.shutdown()
     }
 }

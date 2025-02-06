@@ -5,7 +5,6 @@ import java.security.SecureRandom
 import java.time.Instant
 import java.util.Enumeration
 
-
 class Snowflake(
     private val nodeId: Long,
     private val customEpoch: Long
