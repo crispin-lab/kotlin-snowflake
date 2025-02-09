@@ -9,5 +9,7 @@ jobs:
     uses: ./.github/workflows/ci.yml
 
   cd:
+    needs:
+      - ci
     name: "🛠️"
     uses: ./.github/workflows/cd.yml

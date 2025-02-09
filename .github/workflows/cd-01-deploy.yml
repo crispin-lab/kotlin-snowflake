@@ -23,18 +23,18 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Import GPG key
-        run: |
-          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
 
       - name: Build and sign artifacts
         run: ./gradlew clean build publishToMavenLocal sign
 
       - name: Publish to maven central
-        run: ./gradlew publish
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
           SIGNING_PASSWORD: ${{ secrets.GPG_PASSPHRASE }}
+        run: ./gradlew publish
