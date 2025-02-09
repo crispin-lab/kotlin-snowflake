@@ -4,6 +4,9 @@ import org.jmailen.gradle.kotlinter.tasks.InstallPrePushHookTask
 plugins {
     kotlin("jvm") version "2.1.0"
     id("org.jmailen.kotlinter") version "5.0.1"
+    id("jacoco")
+    signing
+    `maven-publish`
 }
 
 group = "com.crispin-lab"
@@ -20,7 +23,18 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy("jacocoTestReport")
 }
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = false
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
+}
+
 kotlin {
     jvmToolchain(21)
 }
@@ -45,4 +59,66 @@ if (!rootProject.extra.has("install-git-hooks")) {
     project.rootProject.tasks.getByName("prepareKotlinBuildScriptModel") {
         dependsOn(preCommit, prePush)
     }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+
+            groupId = "io.github.crispindeity"
+            artifactId = "kotlin-snowflake"
+            version = "0.0.1"
+
+            pom {
+                name.set("Kotlin Snowflake")
+                description.set("A Kotlin library for generating Snowflake IDs.")
+                inceptionYear.set("2025")
+                url.set("https://github.com/crispin-lab/kotlin-snowflake")
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("crispindeity")
+                        name.set("crispin")
+                        email.set("h.c.shin.dev09@gmail.com")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/crispin-lab/kotlin-snowflake.git")
+                    developerConnection.set(
+                        "scm:git:ssh://github.com/crispin-lab/kotlin-snowflake.git"
+                    )
+                    url.set("https://github.com/crispin-lab/kotlin-snowflake")
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("OSSRH_USERNAME")
+                password = System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+        System.getenv("SIGNING_KEY_ID"),
+        System.getenv("GPG_PRIVATE_KEY"),
+        System.getenv("SIGNING_PASSWORD")
+    )
+    sign(publishing.publications["mavenJava"])
 }
