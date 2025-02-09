@@ -39,7 +39,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.3.1
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
+          slug: crispin-lab/kotlin-snowflake
           fail_ci_if_error: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
