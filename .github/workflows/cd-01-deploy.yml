@@ -33,12 +33,14 @@ jobs:
           SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
           SIGNING_PASSWORD: ${{ secrets.GPG_PASSWORD }}
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: ./gradlew clean build publishToMavenLocal sign
+        run: |
+            export GPG_PRIVATE_KEY=echo "$GPG_PRIVATE_KEY" | base64 --decode
+            ./gradlew clean build publishToMavenLocal sign
 
       - name: Publish to maven central
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
           SIGNING_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
         run: ./gradlew publish
