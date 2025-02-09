@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/crispin-lab/kotlin-snowflake/graph/badge.svg?token=TOIO3MUBMA)](https://codecov.io/gh/crispin-lab/kotlin-snowflake)
+
 # Kotlin snowflake
 
 ## Description
@@ -23,12 +25,15 @@ implementation("io.github.crispindeity:kotlin-snowflake:0.0.1")
 ```
 
 #### Gradle(Groovy)
+
 ```groovy
 implementation group: 'io.github.crispindeity', name: 'kotlin-snowflake', version: '0.0.1'
 ```
 
 #### Maven
+
 ```xml
+
 <dependency>
     <groupId>io.github.crispindeity</groupId>
     <artifactId>kotlin-snowflake</artifactId>
