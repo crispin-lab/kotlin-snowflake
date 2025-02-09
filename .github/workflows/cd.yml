@@ -1,0 +1,7 @@
+on:
+  workflow_call:
+
+jobs:
+  cd:
+    name: "🚀"
+    uses: ./.github/workflows/cd-01-deploy.yml

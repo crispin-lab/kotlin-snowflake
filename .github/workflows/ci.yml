@@ -1,0 +1,11 @@
+on:
+  workflow_call:
+
+jobs:
+  ci-build:
+    name: "🏗️"
+    uses: ./.github/workflows/ci-01-build.yml
+
+  ci-release:
+    name: "✏️"
+    uses: ./.github/workflows/ci-02-release.yml

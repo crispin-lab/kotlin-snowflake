@@ -1,0 +1,11 @@
+name: "🔀CI on PR"
+on:
+  pull_request:
+    branches:
+      - main
+      - release
+jobs:
+  ci:
+    name: "🔨"
+    uses: ./.github/workflows/ci-01-build.yaml
+    secrets: inherit
