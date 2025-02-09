@@ -30,9 +30,9 @@ jobs:
 
       - name: Build and sign artifacts
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          SIGNING_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: ./gradlew clean build publishToMavenLocal sign
 
       - name: Publish to maven central
@@ -40,5 +40,5 @@ jobs:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-          SIGNING_PASSWORD: ${{ secrets.GPG_PASSPHRASE }}
+          SIGNING_PASSWORD: ${{ secrets.GPG_PASSWORD }}
         run: ./gradlew publish
