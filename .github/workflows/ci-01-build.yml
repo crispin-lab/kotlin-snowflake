@@ -40,11 +40,11 @@ jobs:
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
-          token: fe721481-445a-4668-bf70-1bcbbce2314f
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.3.1
         with:
-          token: fe721481-445a-4668-bf70-1bcbbce2314f
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
           fail_ci_if_error: true

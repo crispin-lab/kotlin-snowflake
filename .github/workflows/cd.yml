@@ -5,3 +5,10 @@ jobs:
   cd:
     name: "🚀"
     uses: ./.github/workflows/cd-01-deploy.yml
+    secrets: inherit
+
+  release:
+    needs:
+      - cd
+    name: "✏️"
+    uses: ./.github/workflows/cd-02-release.yml
