@@ -3,7 +3,7 @@ on:
 
 jobs:
   cd:
-    name: "🚀"
+    name: "🔥"
     uses: ./.github/workflows/cd-01-deploy.yml
     secrets: inherit
 
