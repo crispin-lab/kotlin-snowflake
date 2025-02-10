@@ -29,6 +29,7 @@ jobs:
         run: |
           echo "signing.keyId=${{ secrets.GPG_KEY_ID }}" >> ~/.gradle/gradle.properties
           echo "signing.password=${{ secrets.GPG_PASSPHRASE }}" >> ~/.gradle/gradle.properties
+          echo "signing.secretKeyRingFile=$HOME/.gnupg/trustdb.gpg" >> ~/.gradle/gradle.properties
           echo "mavenCentralUsername=${{ secrets.MAVEN_CENTRAL_USERNAME }}" >> ~/.gradle/gradle.properties
           echo "mavenCentralPassword=${{ secrets.MAVEN_CENTRAL_PASSWORD }}" >> ~/.gradle/gradle.properties
           

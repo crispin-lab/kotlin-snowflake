@@ -119,6 +119,5 @@ publishing {
 }
 
 signing {
-    useGpgCmd()
     sign(publishing.publications["mavenJava"])
 }
