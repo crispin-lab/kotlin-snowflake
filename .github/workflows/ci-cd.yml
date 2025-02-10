@@ -11,6 +11,7 @@ jobs:
     secrets: inherit
 
   cd:
+    if: startsWith(github.head_ref, 'release/')
     needs:
       - ci
     name: "🛠️"
