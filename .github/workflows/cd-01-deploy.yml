@@ -26,7 +26,7 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Import Secring key
-        run: gpg --export-secret-keys --pinentry-mode loopback --passphrase="${{ secrets.GPG_PASSPHRASE }}" > ~/.gnupg/secring.gpg
+        run: gpg --export-secret-keys --pinentry-mode loopback --passphrase="${{ secrets.GPG_PASSPHRASE }}" > $HOME/.gnupg/secring.gpg
 
       - name: Decode gradle.properties
         run: |
