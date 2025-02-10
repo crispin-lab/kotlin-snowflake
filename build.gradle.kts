@@ -1,6 +1,8 @@
 import org.jmailen.gradle.kotlinter.tasks.InstallPreCommitHookTask
 import org.jmailen.gradle.kotlinter.tasks.InstallPrePushHookTask
 
+val libraryVersion = "0.0.2"
+
 plugins {
     kotlin("jvm") version "2.1.0"
     id("org.jmailen.kotlinter") version "5.0.1"
@@ -10,7 +12,7 @@ plugins {
 }
 
 group = "com.crispin-lab"
-version = "0.0.1"
+version = libraryVersion
 
 repositories {
     mavenCentral()
@@ -68,7 +70,7 @@ publishing {
 
             groupId = "io.github.crispindeity"
             artifactId = "kotlin-snowflake"
-            version = "0.0.1"
+            version = libraryVersion
 
             pom {
                 name.set("Kotlin Snowflake")
@@ -117,5 +119,6 @@ publishing {
 }
 
 signing {
+    useGpgCmd()
     sign(publishing.publications["mavenJava"])
 }
