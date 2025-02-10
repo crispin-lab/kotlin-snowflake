@@ -44,3 +44,6 @@ jobs:
 
       - name: Publish to maven central
         run: ./gradlew publish
+
+      - name: Post Secring key
+        run: rm $HOME/.gnupg/secring.gpg
