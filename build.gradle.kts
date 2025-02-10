@@ -107,18 +107,15 @@ publishing {
             name = "OSSRH"
             url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
+                username = project.findProperty("ossrhUsername") as String?
+                    ?: System.getenv("OSSRH_USERNAME")
+                password = project.findProperty("ossrhPassword") as String?
+                    ?: System.getenv("OSSRH_PASSWORD")
             }
         }
     }
 }
 
 signing {
-    useInMemoryPgpKeys(
-        System.getenv("SIGNING_KEY_ID"),
-        System.getenv("GPG_PRIVATE_KEY"),
-        System.getenv("SIGNING_PASSWORD")
-    )
     sign(publishing.publications["mavenJava"])
 }
