@@ -73,38 +73,28 @@ class Snowflake private constructor(
 
     fun nextId(): Long =
         lock.withLock {
-            val currentTimestamp: Long = handleSequenceGeneration()
+            var currentTimestamp: Long = timestamp()
+
+            when {
+                currentTimestamp < lastTimestamp -> throw IllegalStateException(
+                    "Clock moved backwards. Refusing to generate ID."
+                )
+
+                currentTimestamp == lastTimestamp -> {
+                    sequence = (sequence + 1) and MAX_SEQUENCE
+                    if (sequence == 0L) {
+                        currentTimestamp = waitNextMillis(currentTimestamp)
+                    }
+                }
+
+                else -> sequence = 0L
+            }
+
             lastTimestamp = currentTimestamp
-            return@withLock currentTimestamp shl
-                (NODE_ID_BITS + SEQUENCE_BITS) or
+            return@withLock (currentTimestamp shl (NODE_ID_BITS + SEQUENCE_BITS)) or
                 (nodeId shl SEQUENCE_BITS) or
                 sequence
         }
-
-    private fun handleSequenceGeneration(): Long {
-        val currentTimestamp: Long = timestamp()
-
-        require(currentTimestamp >= lastTimestamp) {
-            "Invalid System Clock."
-        }
-
-        if (currentTimestamp == lastTimestamp) {
-            sequence = (sequence + 1) and MAX_SEQUENCE
-            return waitForNextTimestamp(currentTimestamp)
-        }
-        sequence = 0
-
-        return currentTimestamp
-    }
-
-    private fun waitForNextTimestamp(currentTimestamp: Long): Long {
-        var timestamp: Long = currentTimestamp
-
-        if (sequence == 0L) {
-            timestamp = waitNextMillis(timestamp)
-        }
-        return timestamp
-    }
 
     private fun timestamp(): Long = Instant.now().toEpochMilli() - customEpoch
 
