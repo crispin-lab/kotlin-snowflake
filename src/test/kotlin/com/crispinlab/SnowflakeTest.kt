@@ -1,5 +1,6 @@
 package com.crispinlab
 
+import com.crispinlab.Snowflake.SnowflakeComponents
 import java.time.Instant
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
@@ -22,11 +23,11 @@ class SnowflakeTest {
         val id: Long = snowflake.nextId()
 
         // then
-        val parses: Array<Long> = snowflake.parse(id)
+        val parses: SnowflakeComponents = snowflake.parse(id)
         SoftAssertions.assertSoftly {
-            it.assertThat(parses[0]).isGreaterThanOrEqualTo(beforeTimestamp)
-            it.assertThat(parses[1]).isEqualTo(nodeId)
-            it.assertThat(parses[2]).isEqualTo(sequence)
+            it.assertThat(parses.timestamp).isGreaterThanOrEqualTo(beforeTimestamp)
+            it.assertThat(parses.nodeId).isEqualTo(nodeId)
+            it.assertThat(parses.sequence).isEqualTo(sequence)
         }
     }
 
@@ -94,14 +95,11 @@ class SnowflakeTest {
 
     @Test
     fun generateNodeIdTest() {
-        // given
-        val nodeIdIndex = 1
-
         // when
         val snowflake = Snowflake()
 
         // then
-        val nodeId: Long = snowflake.parse(snowflake.nextId())[nodeIdIndex]
+        val nodeId: Long = snowflake.parse(snowflake.nextId()).nodeId
         SoftAssertions.assertSoftly {
             it.assertThat(nodeId).isNotNull
             it.assertThat(nodeId).isGreaterThan(0)
@@ -121,5 +119,20 @@ class SnowflakeTest {
             Assertions.assertThat(currentId).isGreaterThan(prevId)
             prevId = currentId
         }
+    }
+
+    @Test
+    fun parsedTimestampToInstantTest() {
+        // given
+        val nodeId = 777L
+        val snowflake = Snowflake(nodeId)
+        val id: Long = snowflake.nextId()
+        val parses: SnowflakeComponents = snowflake.parse(id)
+
+        // when
+        val result: Instant = parses.toInstant()
+
+        // then
+        Assertions.assertThat(result).isEqualTo(Instant.ofEpochMilli(parses.timestamp))
     }
 }
