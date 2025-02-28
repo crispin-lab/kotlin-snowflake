@@ -5,15 +5,12 @@ import java.security.SecureRandom
 import java.time.Instant
 import java.util.Enumeration
 
-class Snowflake(
+class Snowflake private constructor(
     private val nodeId: Long,
     private val customEpoch: Long
 ) {
-    init {
-        require(
-            nodeId in 1.rangeTo(MAX_NODE_ID)
-        ) { "NodeId must be between ${0} and $MAX_NODE_ID" }
-    }
+    private var lastTimestamp: Long = -1L
+    private var sequence: Long = 0L
 
     companion object {
         @Suppress("unused")
@@ -50,14 +47,26 @@ class Snowflake(
             }
             return stringBuilder.toString().hashCode()
         }
+
+        fun create() = Snowflake(nodeId = createNodeId(), customEpoch = DEFAULT_EPOCH)
+
+        fun create(nodeId: Long): Snowflake {
+            require(nodeId in 0..MAX_NODE_ID) {
+                "NodeId must be between 0 and $MAX_NODE_ID"
+            }
+            return Snowflake(nodeId, DEFAULT_EPOCH)
+        }
+
+        fun create(
+            nodeId: Long,
+            customEpoch: Long
+        ): Snowflake {
+            require(nodeId in 0..MAX_NODE_ID) {
+                "NodeId must be between 0 and $MAX_NODE_ID"
+            }
+            return Snowflake(nodeId, customEpoch)
+        }
     }
-
-    private var lastTimestamp: Long = -1L
-
-    private var sequence: Long = 0L
-
-    constructor(nodeId: Long) : this(nodeId, customEpoch = DEFAULT_EPOCH)
-    constructor() : this(nodeId = createNodeId(), customEpoch = DEFAULT_EPOCH)
 
     @Synchronized
     fun nextId(): Long {
