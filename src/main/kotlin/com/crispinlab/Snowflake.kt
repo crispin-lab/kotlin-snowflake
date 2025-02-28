@@ -4,11 +4,14 @@ import java.net.NetworkInterface
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.Enumeration
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 class Snowflake private constructor(
     private val nodeId: Long,
     private val customEpoch: Long
 ) {
+    private val lock = ReentrantLock()
     private var lastTimestamp: Long = -1L
     private var sequence: Long = 0L
 
@@ -68,15 +71,15 @@ class Snowflake private constructor(
         }
     }
 
-    @Synchronized
-    fun nextId(): Long {
-        val currentTimestamp: Long = handleSequenceGeneration()
-        lastTimestamp = currentTimestamp
-        return currentTimestamp shl
-            (NODE_ID_BITS + SEQUENCE_BITS) or
-            (nodeId shl SEQUENCE_BITS) or
-            sequence
-    }
+    fun nextId(): Long =
+        lock.withLock {
+            val currentTimestamp: Long = handleSequenceGeneration()
+            lastTimestamp = currentTimestamp
+            return@withLock currentTimestamp shl
+                (NODE_ID_BITS + SEQUENCE_BITS) or
+                (nodeId shl SEQUENCE_BITS) or
+                sequence
+        }
 
     private fun handleSequenceGeneration(): Long {
         val currentTimestamp: Long = timestamp()
