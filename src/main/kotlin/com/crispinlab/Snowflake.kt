@@ -105,14 +105,22 @@ class Snowflake(
         return timestamp
     }
 
-    fun parse(id: Long): Array<Long> {
+    fun parse(id: Long): SnowflakeComponents {
         val maskNodeId: Long = ((1L shl NODE_ID_BITS) - 1) shl SEQUENCE_BITS
         val maskSequence: Long = (1L shl SEQUENCE_BITS) - 1
         val timestamp: Long = (id shr (NODE_ID_BITS + SEQUENCE_BITS)) + customEpoch
         val nodeId: Long = (id and maskNodeId) shr SEQUENCE_BITS
         val sequence: Long = id and maskSequence
 
-        return arrayOf(timestamp, nodeId, sequence)
+        return SnowflakeComponents(nodeId, timestamp, sequence)
+    }
+
+    data class SnowflakeComponents(
+        val nodeId: Long,
+        val timestamp: Long,
+        val sequence: Long
+    ) {
+        fun toInstant(): Instant = Instant.ofEpochMilli(timestamp)
     }
 
     override fun toString(): String =
