@@ -16,8 +16,6 @@ class Snowflake private constructor(
     private var sequence: Long = 0L
 
     companion object {
-        @Suppress("unused")
-        private const val UNUSED_SIGN_BIT: Int = 1
         private const val EPOCH_BITS: Int = 41
         private const val NODE_ID_BITS: Int = 10
         private const val SEQUENCE_BITS: Int = 12
