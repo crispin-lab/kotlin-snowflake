@@ -27,30 +27,6 @@ class Snowflake private constructor(
         // Default Epoch (2025-01-01T00:00:00Z)
         private const val DEFAULT_EPOCH: Long = 1735689600000L
 
-        private fun createNodeId(): Long {
-            val nodeId: Int =
-                try {
-                    nodeIdBuilder()
-                } catch (e: Exception) {
-                    SecureRandom().nextInt()
-                }
-            return nodeId.toLong() and MAX_NODE_ID
-        }
-
-        private fun nodeIdBuilder(): Int {
-            val stringBuilder = StringBuilder()
-            val networkInterfaces: Enumeration<NetworkInterface> =
-                NetworkInterface.getNetworkInterfaces()
-
-            while (networkInterfaces.hasMoreElements()) {
-                val networkInterface: NetworkInterface = networkInterfaces.nextElement()
-                networkInterface.hardwareAddress.let { byteArray: ByteArray ->
-                    byteArray.map { stringBuilder.append(it) }
-                }
-            }
-            return stringBuilder.toString().hashCode()
-        }
-
         fun create() = Snowflake(nodeId = createNodeId(), customEpoch = DEFAULT_EPOCH)
 
         fun create(nodeId: Long): Snowflake {
@@ -69,6 +45,28 @@ class Snowflake private constructor(
             }
             return Snowflake(nodeId, customEpoch)
         }
+
+        private fun createNodeId(): Long =
+            try {
+                val stringBuilder = StringBuilder()
+                val networkInterfaces: Enumeration<NetworkInterface> =
+                    NetworkInterface.getNetworkInterfaces()
+
+                while (networkInterfaces.hasMoreElements()) {
+                    val networkInterface: NetworkInterface = networkInterfaces.nextElement()
+                    networkInterface.hardwareAddress?.let { mac ->
+                        mac.forEach { stringBuilder.append(it) }
+                    }
+                }
+
+                if (stringBuilder.isEmpty()) {
+                    SecureRandom().nextLong() and MAX_NODE_ID
+                } else {
+                    stringBuilder.toString().hashCode().toLong() and MAX_NODE_ID
+                }
+            } catch (exception: Exception) {
+                SecureRandom().nextLong() and MAX_NODE_ID
+            }
     }
 
     fun nextId(): Long =
