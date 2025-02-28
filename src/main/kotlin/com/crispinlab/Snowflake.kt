@@ -7,6 +7,14 @@ import java.util.Enumeration
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
+/**
+ * Distributed Unique ID Generator using Snowflake algorithm
+ * Structure:
+ * - 1 bit: Unused (sign bit)
+ * - 41 bits: Timestamp (milliseconds since epoch)
+ * - 10 bits: Node ID
+ * - 12 bits: Sequence number
+ */
 class Snowflake private constructor(
     private val nodeId: Long,
     private val customEpoch: Long
@@ -25,8 +33,18 @@ class Snowflake private constructor(
         // Default Epoch (2025-01-01T00:00:00Z)
         private const val DEFAULT_EPOCH: Long = 1735689600000L
 
+        /**
+         * Creates a Snowflake generator with automatically derived node ID and default epoch.
+         * @return Snowflake generator instance with automatically derived node ID and default epoch.
+         */
         fun create() = Snowflake(nodeId = createNodeId(), customEpoch = DEFAULT_EPOCH)
 
+        /**
+         * Creates a Snowflake generator with the specified node ID and default epoch
+         * @param nodeId specified node ID (a value greater than 0)
+         * @throws IllegalStateException if the node ID is less than or equal to 0
+         * @return Snowflake generator instance with specified node ID and default epoch
+         */
         fun create(nodeId: Long): Snowflake {
             require(nodeId in 0..MAX_NODE_ID) {
                 "NodeId must be between 0 and $MAX_NODE_ID"
@@ -34,6 +52,13 @@ class Snowflake private constructor(
             return Snowflake(nodeId, DEFAULT_EPOCH)
         }
 
+        /**
+         * Creates a Snowflake generator with the specified node ID and custom epoch
+         * @param nodeId specified node ID (a value greater than 0)
+         * @param customEpoch custom epoch
+         * @throws IllegalStateException if the node ID is less than or equal to 0
+         * @return Snowflake generator instance with specified node ID and custom epoch
+         */
         fun create(
             nodeId: Long,
             customEpoch: Long
@@ -67,6 +92,10 @@ class Snowflake private constructor(
             }
     }
 
+    /**
+     * Generates a new unique ID
+     * @return a unique snowflake ID
+     */
     fun nextId(): Long =
         lock.withLock {
             var currentTimestamp: Long = timestamp()
@@ -103,6 +132,11 @@ class Snowflake private constructor(
         return timestamp
     }
 
+    /**
+     * Parses a snowflake ID into its components
+     * @param id the snowflake ID to parse
+     * @return SnowflakeComponents instance with node ID, timestamp, sequence, toInstant()
+     */
     fun parse(id: Long): SnowflakeComponents {
         val maskNodeId: Long = ((1L shl NODE_ID_BITS) - 1) shl SEQUENCE_BITS
         val maskSequence: Long = (1L shl SEQUENCE_BITS) - 1
@@ -113,11 +147,18 @@ class Snowflake private constructor(
         return SnowflakeComponents(nodeId, timestamp, sequence)
     }
 
+    /**
+     * Data class to hold parsed snowflake components
+     */
     data class SnowflakeComponents(
         val nodeId: Long,
         val timestamp: Long,
         val sequence: Long
     ) {
+        /**
+         * Converts an epoch time to an Instant
+         * @return An Instant representing the specified epoch time
+         */
         fun toInstant(): Instant = Instant.ofEpochMilli(timestamp)
     }
 
