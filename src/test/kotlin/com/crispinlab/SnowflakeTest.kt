@@ -16,7 +16,7 @@ class SnowflakeTest {
         // given
         val sequence = 0L
         val nodeId = 777L
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
         val beforeTimestamp: Long = Instant.now().toEpochMilli()
 
         // when
@@ -37,7 +37,7 @@ class SnowflakeTest {
         val nodeId = 777L
         val iterations = 7777
         val ids = LongArray(iterations)
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
 
         // when
         for (i: Int in 0..<iterations) {
@@ -55,7 +55,7 @@ class SnowflakeTest {
         val nodeId = 777L
         val threadCount = 50
         val iterations = 100000
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
         val latch = CountDownLatch(threadCount)
         val futures: Array<Future<Long>?> = arrayOfNulls(iterations)
         val executorService: ExecutorService = Executors.newFixedThreadPool(threadCount)
@@ -87,7 +87,7 @@ class SnowflakeTest {
         // when & then
         Assertions
             .assertThatThrownBy {
-                Snowflake(wrongNodeId)
+                Snowflake.create(wrongNodeId)
             }.hasMessage(
                 "NodeId must be between ${0} and $maxNodeId"
             )
@@ -96,7 +96,7 @@ class SnowflakeTest {
     @Test
     fun generateNodeIdTest() {
         // when
-        val snowflake = Snowflake()
+        val snowflake: Snowflake = Snowflake.create()
 
         // then
         val nodeId: Long = snowflake.parse(snowflake.nextId()).nodeId
@@ -110,7 +110,7 @@ class SnowflakeTest {
     fun snowflakeTimeOrderTest() {
         // given
         val nodeId = 777L
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
 
         // when & then
         var prevId: Long = snowflake.nextId()
@@ -125,7 +125,7 @@ class SnowflakeTest {
     fun parsedTimestampToInstantTest() {
         // given
         val nodeId = 777L
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
         val id: Long = snowflake.nextId()
         val parses: SnowflakeComponents = snowflake.parse(id)
 

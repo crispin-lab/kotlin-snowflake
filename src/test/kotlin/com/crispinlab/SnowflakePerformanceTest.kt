@@ -12,7 +12,7 @@ class SnowflakePerformanceTest {
         // given
         val nodeId = 777L
         val iterations = 1000000
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
         val start: Long = System.currentTimeMillis()
 
         // when
@@ -32,7 +32,7 @@ class SnowflakePerformanceTest {
         val nodeId = 777L
         val threadCount = 50
         val iterations = 1000000
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
         val latch = CountDownLatch(threadCount)
         val futures: Array<Future<Long>?> = arrayOfNulls(iterations)
         val executorService: ExecutorService = Executors.newFixedThreadPool(threadCount)
