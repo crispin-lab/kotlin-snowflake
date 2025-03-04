@@ -149,4 +149,37 @@ class SnowflakeTest {
         // then
         Assertions.assertThat(snowflake.parse(nodeId).toInstant()).isEqualTo(instant)
     }
+
+    @Test
+    fun generateSnowflakeWithSpecificNodeIdAndCustomEpochFailTest() {
+        // given
+        val wrongNodeId = -1L
+        val nodeIdBits = 10
+        val customEpoch = 1704067200L
+        val maxNodeId: Long = (1L shl nodeIdBits) - 1
+
+        // when & then
+        Assertions
+            .assertThatThrownBy {
+                Snowflake.create(wrongNodeId, customEpoch)
+            }.hasMessage(
+                "NodeId must be between ${0} and $maxNodeId"
+            )
+    }
+
+    @Test
+    fun getSnowflakeSettingTest() {
+        // given
+        val nodeId = 777L
+
+        // when
+        val snowflake: Snowflake = Snowflake.create(nodeId)
+
+        // then
+        Assertions
+            .assertThat(snowflake.toString())
+            .isEqualTo(
+                "Snowflake Settings [EPOCH_BITS=41, NODE_ID_BITS=10, SEQUENCE_BITS=12, CUSTOM_EPOCH=1735689600000, NodeId=777]"
+            )
+    }
 }
