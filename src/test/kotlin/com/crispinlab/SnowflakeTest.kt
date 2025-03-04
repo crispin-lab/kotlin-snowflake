@@ -1,5 +1,6 @@
 package com.crispinlab
 
+import com.crispinlab.Snowflake.SnowflakeComponents
 import java.time.Instant
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
@@ -15,18 +16,18 @@ class SnowflakeTest {
         // given
         val sequence = 0L
         val nodeId = 777L
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
         val beforeTimestamp: Long = Instant.now().toEpochMilli()
 
         // when
         val id: Long = snowflake.nextId()
 
         // then
-        val parses: Array<Long> = snowflake.parse(id)
+        val parses: SnowflakeComponents = snowflake.parse(id)
         SoftAssertions.assertSoftly {
-            it.assertThat(parses[0]).isGreaterThanOrEqualTo(beforeTimestamp)
-            it.assertThat(parses[1]).isEqualTo(nodeId)
-            it.assertThat(parses[2]).isEqualTo(sequence)
+            it.assertThat(parses.timestamp).isGreaterThanOrEqualTo(beforeTimestamp)
+            it.assertThat(parses.nodeId).isEqualTo(nodeId)
+            it.assertThat(parses.sequence).isEqualTo(sequence)
         }
     }
 
@@ -36,7 +37,7 @@ class SnowflakeTest {
         val nodeId = 777L
         val iterations = 7777
         val ids = LongArray(iterations)
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
 
         // when
         for (i: Int in 0..<iterations) {
@@ -54,7 +55,7 @@ class SnowflakeTest {
         val nodeId = 777L
         val threadCount = 50
         val iterations = 100000
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
         val latch = CountDownLatch(threadCount)
         val futures: Array<Future<Long>?> = arrayOfNulls(iterations)
         val executorService: ExecutorService = Executors.newFixedThreadPool(threadCount)
@@ -86,7 +87,7 @@ class SnowflakeTest {
         // when & then
         Assertions
             .assertThatThrownBy {
-                Snowflake(wrongNodeId)
+                Snowflake.create(wrongNodeId)
             }.hasMessage(
                 "NodeId must be between ${0} and $maxNodeId"
             )
@@ -94,14 +95,11 @@ class SnowflakeTest {
 
     @Test
     fun generateNodeIdTest() {
-        // given
-        val nodeIdIndex = 1
-
         // when
-        val snowflake = Snowflake()
+        val snowflake: Snowflake = Snowflake.create()
 
         // then
-        val nodeId: Long = snowflake.parse(snowflake.nextId())[nodeIdIndex]
+        val nodeId: Long = snowflake.parse(snowflake.nextId()).nodeId
         SoftAssertions.assertSoftly {
             it.assertThat(nodeId).isNotNull
             it.assertThat(nodeId).isGreaterThan(0)
@@ -112,7 +110,7 @@ class SnowflakeTest {
     fun snowflakeTimeOrderTest() {
         // given
         val nodeId = 777L
-        val snowflake = Snowflake(nodeId)
+        val snowflake: Snowflake = Snowflake.create(nodeId)
 
         // when & then
         var prevId: Long = snowflake.nextId()
@@ -121,5 +119,67 @@ class SnowflakeTest {
             Assertions.assertThat(currentId).isGreaterThan(prevId)
             prevId = currentId
         }
+    }
+
+    @Test
+    fun parsedTimestampToInstantTest() {
+        // given
+        val nodeId = 777L
+        val snowflake: Snowflake = Snowflake.create(nodeId)
+        val id: Long = snowflake.nextId()
+        val parses: SnowflakeComponents = snowflake.parse(id)
+
+        // when
+        val result: Instant = parses.toInstant()
+
+        // then
+        Assertions.assertThat(result).isEqualTo(Instant.ofEpochMilli(parses.timestamp))
+    }
+
+    @Test
+    fun generateSnowflakeWithSpecificNodeIdAndCustomEpochTest() {
+        // given
+        val nodeId = 777L
+        val customEpoch = 1704067200L
+        val instant: Instant = Instant.ofEpochMilli(customEpoch)
+
+        // when
+        val snowflake: Snowflake = Snowflake.create(nodeId, customEpoch)
+
+        // then
+        Assertions.assertThat(snowflake.parse(nodeId).toInstant()).isEqualTo(instant)
+    }
+
+    @Test
+    fun generateSnowflakeWithSpecificNodeIdAndCustomEpochFailTest() {
+        // given
+        val wrongNodeId = -1L
+        val nodeIdBits = 10
+        val customEpoch = 1704067200L
+        val maxNodeId: Long = (1L shl nodeIdBits) - 1
+
+        // when & then
+        Assertions
+            .assertThatThrownBy {
+                Snowflake.create(wrongNodeId, customEpoch)
+            }.hasMessage(
+                "NodeId must be between ${0} and $maxNodeId"
+            )
+    }
+
+    @Test
+    fun getSnowflakeSettingTest() {
+        // given
+        val nodeId = 777L
+
+        // when
+        val snowflake: Snowflake = Snowflake.create(nodeId)
+
+        // then
+        Assertions
+            .assertThat(snowflake.toString())
+            .isEqualTo(
+                "Snowflake Settings [EPOCH_BITS=41, NODE_ID_BITS=10, SEQUENCE_BITS=12, CUSTOM_EPOCH=1735689600000, NodeId=777]"
+            )
     }
 }
