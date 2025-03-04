@@ -135,4 +135,18 @@ class SnowflakeTest {
         // then
         Assertions.assertThat(result).isEqualTo(Instant.ofEpochMilli(parses.timestamp))
     }
+
+    @Test
+    fun generateSnowflakeWithSpecificNodeIdAndCustomEpochTest() {
+        // given
+        val nodeId = 777L
+        val customEpoch = 1704067200L
+        val instant: Instant = Instant.ofEpochMilli(customEpoch)
+
+        // when
+        val snowflake: Snowflake = Snowflake.create(nodeId, customEpoch)
+
+        // then
+        Assertions.assertThat(snowflake.parse(nodeId).toInstant()).isEqualTo(instant)
+    }
 }
