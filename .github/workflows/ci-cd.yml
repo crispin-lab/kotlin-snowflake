@@ -1,8 +1,5 @@
 name: "🔄CI & CD"
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -16,10 +13,6 @@ jobs:
     secrets: inherit
 
   cd:
-    if: >
-      github.event_name == 'pull_request' && 
-      github.base_ref == 'main' && 
-      github.event.pull_request.merged == 'true'
     needs:
       - ci
     name: "🛠️"
