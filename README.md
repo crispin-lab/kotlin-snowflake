@@ -21,13 +21,13 @@ snowflake.nextId()
 #### Gradle(Kotlin)
 
 ```kotlin
-implementation("io.github.crispindeity:kotlin-snowflake:1.0.0")
+implementation("io.github.crispindeity:kotlin-snowflake:1.0.1")
 ```
 
 #### Gradle(Groovy)
 
 ```groovy
-implementation group: 'io.github.crispindeity', name: 'kotlin-snowflake', version: '1.0.0'
+implementation group: 'io.github.crispindeity', name: 'kotlin-snowflake', version: '1.0.1'
 ```
 
 #### Maven
@@ -37,6 +37,6 @@ implementation group: 'io.github.crispindeity', name: 'kotlin-snowflake', versio
 <dependency>
     <groupId>io.github.crispindeity</groupId>
     <artifactId>kotlin-snowflake</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```

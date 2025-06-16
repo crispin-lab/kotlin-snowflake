@@ -2,7 +2,7 @@ import com.vanniktech.maven.publish.SonatypeHost
 import org.jmailen.gradle.kotlinter.tasks.InstallPreCommitHookTask
 import org.jmailen.gradle.kotlinter.tasks.InstallPrePushHookTask
 
-val libraryVersion = "1.0.0"
+val libraryVersion = "1.0.1"
 
 plugins {
     kotlin("jvm") version "1.9.25"
